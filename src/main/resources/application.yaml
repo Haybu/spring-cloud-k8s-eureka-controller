@@ -1,0 +1,35 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: spring-cloud-k8s-eureka-controller
+  main:
+    web-application-type: none
+
+eureka:
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    healthcheck:
+      enabled: true
+    lease:
+      duration: 5
+  instance:
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 2
+
+
+logging:
+  level:
+    com.netflix.eureka: OFF
+    com.netflix.discovery: OFF
+
+k8s:
+  informer:
+    watcher-interval: 30
+    label-enabled: config.spring.io/enabled
+    label-register: condfig.spring.io/register
+    primary-port-name: primary_port
