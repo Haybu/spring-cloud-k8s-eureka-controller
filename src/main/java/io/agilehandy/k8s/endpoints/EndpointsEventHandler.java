@@ -98,14 +98,17 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 		}
 	}
 
-	private void register(Endpoints ep) {
+	private List<Registration> register(Endpoints ep) {
 		List<Application> applications = this.getApplications(ep);
+		List<Registration> registrations = new ArrayList<>();
 		for (Application app: applications) {
 			InstanceInfo instanceInfo = this.lite.register(app);
 			Registration registration = new Registration();
 			registration.setApplication(app);
 			registration.update(instanceInfo);
+			registrations.add(registration);
 		}
+		return registrations;
 	}
 
 	private void unregister(Endpoints ep) {
@@ -128,6 +131,8 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 					if (endpointAddress.getTargetRef() != null) {
 						instanceId = endpointAddress.getTargetRef().getUid();
 					}
+
+					// TODO: check and error handling if instanceId is null
 
 					EndpointPort endpointPort = this.findEndpointPort(subset);
 					applications.add(new Application(ep.getMetadata().getName(),
@@ -165,6 +170,7 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 	// ------------ for logging purpose ---------------------
 	private String logEndpoints(Endpoints ep) {
 		StringBuilder sb = new StringBuilder("namespace: "  + ep.getMetadata().getNamespace());
+		sb.append("\tendpoint name: " + ep.getMetadata().getName());
 		Map<String, Map<String, String>> map = this.endpointInstanceIds(ep);
 		map.entrySet().stream().forEach(entry -> {
 			String serviceName = entry.getKey();

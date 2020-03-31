@@ -6,6 +6,10 @@ spring:
     name: spring-cloud-k8s-eureka-controller
   main:
     web-application-type: none
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
 
 eureka:
   client:
@@ -18,14 +22,17 @@ eureka:
     lease:
       duration: 5
   instance:
-    leaseRenewalIntervalInSeconds: 1
-    leaseExpirationDurationInSeconds: 2
+    hostname: localhost
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30      # heartbeats frequency to renew instance registration (default 30 seconds)
+    lease-expiration-duration-in-seconds: 40   # server to wait this long for a client heartbeat before removing it
 
 
 logging:
   level:
     com.netflix.eureka: OFF
     com.netflix.discovery: OFF
+    io.fabric8.kubernetes.client.informers.cache: OFF
 
 k8s:
   informer:
