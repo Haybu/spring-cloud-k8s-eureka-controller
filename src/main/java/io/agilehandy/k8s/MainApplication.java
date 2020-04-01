@@ -6,9 +6,11 @@ import io.agilehandy.k8s.eureka.EurekaLiteProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.netflix.eureka.EurekaClientConfigBean;
 
 @SpringBootApplication
-@EnableConfigurationProperties(value={CommonInformerProperties.class, EurekaLiteProperties.class})
+@EnableConfigurationProperties(value={CommonInformerProperties.class
+		, EurekaLiteProperties.class, EurekaClientConfigBean.class})
 public class MainApplication {
 
 	public static void main(String[] args) {

@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.netflix.appinfo.InstanceInfo;
-import com.netflix.discovery.EurekaClientConfig;
 import com.netflix.discovery.shared.Applications;
 import com.netflix.discovery.shared.resolver.ClosableResolver;
 import com.netflix.discovery.shared.resolver.EndpointRandomizer;
@@ -50,10 +49,10 @@ public class Eureka implements ApplicationContextAware {
 	private EurekaClientConfigBean clientConfig;
 	private EurekaTransport transport;
 
-	public Eureka(InetUtils inetUtils, CloudEurekaClient eurekaClient) {
+	public Eureka(InetUtils inetUtils, CloudEurekaClient eurekaClient, EurekaClientConfigBean clientConfig) {
 		this.inetUtils = inetUtils;
 		this.eurekaClient = eurekaClient;
-		this.clientConfig = new EurekaClientConfigBean();
+		this.clientConfig = clientConfig;
 		this.clientConfig.setRegisterWithEureka(false); // turn off registering with eureka, let apps send heartbeats.
 		this.transport = createTransport();
 	}
@@ -135,7 +134,7 @@ public class Eureka implements ApplicationContextAware {
 		return new EurekaTransport(httpClientFactory, httpClientFactory.newClient(), transportClientFactory, bootstrapResolver);
 	}
 
-	public static TransportClientFactory newTransportClientFactory(final EurekaClientConfig clientConfig,
+	public static TransportClientFactory newTransportClientFactory(final EurekaClientConfigBean clientConfig,
 																   final Collection<ClientFilter> additionalFilters
 																   ) {
 		final TransportClientFactory jerseyFactory = JerseyEurekaHttpClientFactory.create(
@@ -145,7 +144,7 @@ public class Eureka implements ApplicationContextAware {
 		return new TransportClientFactory() {
 			@Override
 			public EurekaHttpClient newClient(EurekaEndpoint serviceUrl) {
-				logger.info("----> serviceUrl: " + serviceUrl);/////////
+				logger.info("serviceUrl: " + serviceUrl.getServiceUrl());
 				return metricsFactory.newClient(serviceUrl);
 			}
 
