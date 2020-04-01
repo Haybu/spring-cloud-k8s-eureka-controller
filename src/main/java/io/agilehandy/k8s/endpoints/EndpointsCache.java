@@ -40,7 +40,6 @@ public class EndpointsCache {
 	private static Logger logger = LoggerFactory.getLogger(EndpointsCache.class);
 
 	// set of resourceVersion
-
 	private final Set<String> cache = new ConcurrentSkipListSet();
 
 	private final KubernetesClient client;
@@ -59,8 +58,16 @@ public class EndpointsCache {
 	public boolean isSynced() { return synced; }
 
 	public boolean exists(Endpoints ep) {
-
 		return cache.contains(ep.getMetadata().getResourceVersion());
+	}
+
+	public boolean isSame(Endpoints ep1, Endpoints ep2) {
+		return ep1.getMetadata().getResourceVersion()
+				== ep2.getMetadata().getResourceVersion();
+	}
+
+	public boolean updatedEndpointsInCache(Endpoints oldep, Endpoints newep) {
+		return isSame(oldep, newep) && exists(oldep) && exists(newep);
 	}
 
 	public void removeFromCache(Endpoints ep) {

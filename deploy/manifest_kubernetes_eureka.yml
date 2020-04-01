@@ -1,0 +1,70 @@
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  labels:
+    name: "eureka-server"
+    version: "0.0.1-SNAPSHOT"
+  name: "eureka-server"
+spec:
+  ports:
+    - name: "http"
+      nodePort: 8761
+      port: 8761
+      targetPort: 8761
+  selector:
+    name: "eureka-server"
+    version: "0.0.1-SNAPSHOT"
+  type: "NodePort"
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  labels:
+    name: "eureka-server"
+    version: "0.0.1-SNAPSHOT"
+  name: "eureka-server"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: "eureka-server"
+      version: "0.0.1-SNAPSHOT"
+  template:
+    metadata:
+      labels:
+        name: "eureka-server"
+        version: "0.0.1-SNAPSHOT"
+    spec:
+      containers:
+      - env:
+        - name: "KUBERNETES_NAMESPACE"
+          valueFrom:
+            fieldRef:
+              fieldPath: "metadata.namespace"
+        name: "eureka-server"
+        image: "haybu/eureka-server:v0"
+        imagePullPolicy: "IfNotPresent"
+        ports:
+          - containerPort: 8761
+            name: "http"
+            protocol: "TCP"
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: "/actuator/health"
+            port: 8761
+            scheme: "HTTP"
+          initialDelaySeconds: 0
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: "/actuator/health"
+            port: 8761
+            scheme: "HTTP"
+          initialDelaySeconds: 0
+          periodSeconds: 4
+          successThreshold: 1
+          timeoutSeconds: 10

@@ -21,7 +21,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Haytham Mohamed
  **/
 
-@ConfigurationProperties("k8s.informer")
+@ConfigurationProperties("eureka.k8s.proxy")
 public class CommonInformerProperties {
 
 	private int watcherInterval = 30;

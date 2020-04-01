@@ -20,8 +20,8 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 import javax.annotation.PostConstruct;
 
-import io.agilehandy.k8s.common.CommonUtil;
 import io.agilehandy.k8s.common.CommonInformerProperties;
+import io.agilehandy.k8s.common.CommonUtil;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.informers.cache.Lister;
@@ -59,6 +59,16 @@ public class ServiceCache {
 
 	public boolean exists(Service service) {
 		return cache.contains(service.getMetadata().getResourceVersion());
+	}
+
+	public boolean isSame(Service s1, Service s2) {
+		return s1.getMetadata().getResourceVersion()
+				== s2.getMetadata().getResourceVersion();
+	}
+
+	public boolean updatedServiceInCache(Service oldservice, Service newservice) {
+		return isSame(oldservice, newservice)
+				&& exists(oldservice) && exists(newservice);
 	}
 
 	public void removeFromCache(Service service) {

@@ -1,0 +1,72 @@
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  labels:
+    name: "springcloud-eureka-controller"
+    version: "0.0.1-SNAPSHOT"
+  name: "springcloud-eureka-controller"
+spec:
+  ports:
+  - name: "http"
+    port: 8181
+    targetPort: 8181
+  selector:
+    name: "springcloud-eureka-controller"
+    version: "0.0.1-SNAPSHOT"
+  type: "ClusterIP"
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  labels:
+    name: "springcloud-eureka-controller"
+    version: "0.0.1-SNAPSHOT"
+  name: "springcloud-eureka-controller"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: "springcloud-eureka-controller"
+      version: "0.0.1-SNAPSHOT"
+  template:
+    metadata:
+      labels:
+        name: "springcloud-eureka-controller"
+        version: "0.0.1-SNAPSHOT"
+    spec:
+      containers:
+      - env:
+        - name: "KUBERNETES_NAMESPACE"
+          valueFrom:
+            fieldRef:
+              fieldPath: "metadata.namespace"
+        - name: "SPRING_PROFILES_ACTIVE"
+          value: "kubernetes"
+        image: "haybu/spring-cloud-k8s-eureka-controller:v0"
+        imagePullPolicy: "IfNotPresent"
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: "/actuator/health"
+            port: 8181
+            scheme: "HTTP"
+          initialDelaySeconds: 0
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10
+        name: "springcloud-eureka-controller"
+        ports:
+        - containerPort: 8181
+          name: "http"
+          protocol: "TCP"
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: "/actuator/health"
+            port: 8181
+            scheme: "HTTP"
+          initialDelaySeconds: 0
+          periodSeconds: 4
+          successThreshold: 1
+          timeoutSeconds: 10

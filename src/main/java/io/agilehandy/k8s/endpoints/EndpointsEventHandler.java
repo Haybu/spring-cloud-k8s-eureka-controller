@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import com.netflix.appinfo.InstanceInfo;
 import io.agilehandy.k8s.common.CommonInformerProperties;
@@ -65,9 +66,8 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 				&& !cache.exists(ep)
 		) {
 			cache.addToCache(ep);
-			logger.info("{} spring endpoint is added", logEndpoints(ep));
-			this.register(ep);
-
+			List<Registration> registrations = this.register(ep);
+			logger.debug("{} spring endpoint is added", logEndpoints(ep));
 		}
 	}
 
@@ -76,13 +76,12 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 		if (cache.isSynced()
 				&& CommonUtil.isSpringLabeled(oldep.getMetadata(), properties.getLabelEnabled())
 				&& CommonUtil.isSpringLabeled(newep.getMetadata(), properties.getLabelEnabled())
-				&& !cache.exists(newep)
+				&& cache.updatedEndpointsInCache(oldep, newep)
 		) {
 			cache.removeFromCache(oldep);
-			this.unregister(oldep);
 			cache.addToCache(newep);
-			this.register(newep);
-			logger.info("{} spring endpoint is updated", logEndpoints(oldep));
+			renewLease(newep);
+			logger.debug("{} spring endpoint is updated", logEndpoints(oldep));
 		}
 	}
 
@@ -94,7 +93,7 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 		) {
 			cache.removeFromCache(ep);
 			this.unregister(ep);
-			logger.info("{} spring endpoint is deleted", logEndpoints(ep));
+			logger.debug("{} spring endpoint is deleted", logEndpoints(ep));
 		}
 	}
 
@@ -116,6 +115,16 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 		for (Application app: applications) {
 			this.lite.cancel(app.getName(), app.getInstance_id());
 		}
+	}
+
+	private void renewLease(Endpoints ep) {
+		this.getInstancesInfo(ep).stream().forEach(lite::renew);
+	}
+
+	private List<InstanceInfo> getInstancesInfo(Endpoints ep) {
+		return this.getApplications(ep).stream()
+				.map(lite::getInstanceInfo)
+				.collect(Collectors.toList());
 	}
 
 	// construct applications to use with Eureka lite API

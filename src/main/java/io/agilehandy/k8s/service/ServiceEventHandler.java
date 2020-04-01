@@ -48,6 +48,7 @@ public class ServiceEventHandler implements ResourceEventHandler<Service> {
 				&& !cache.exists(service)
 		) {
 			cache.addToCache(service);
+			// TODO: action here
 			logger.debug("{} spring Service is added", logService(service));
 		}
 	}
@@ -57,10 +58,11 @@ public class ServiceEventHandler implements ResourceEventHandler<Service> {
 		if (cache.isSynced()
 				&& CommonUtil.isSpringLabeled(oldservice.getMetadata(), properties.getLabelEnabled())
 				&& CommonUtil.isSpringLabeled(newservice.getMetadata(), properties.getLabelEnabled())
-				&& !cache.exists(newservice)
+				&& !cache.updatedServiceInCache(oldservice, newservice)
 		) {
 			cache.removeFromCache(oldservice);
 			cache.addToCache(newservice);
+			// TODO: action here
 			logger.debug("{} spring Service is updated", logService(oldservice));
 		}
 	}
@@ -72,6 +74,7 @@ public class ServiceEventHandler implements ResourceEventHandler<Service> {
 				&& cache.exists(service)
 		) {
 			cache.removeFromCache(service);
+			// TODO: action here
 			logger.debug("{} spring Service is deleted", logService(service));
 		}
 	}

@@ -1,9 +1,10 @@
 server:
-  port: 8761
+  port: 8181
+
 
 spring:
   application:
-    name: spring-cloud-k8s-eureka-controller
+    name: springcloud-eureka-controller
   main:
     web-application-type: none
   cloud:
@@ -12,13 +13,19 @@ spring:
         enabled: false
 
 eureka:
+  k8s:
+    proxy:
+      watcher-interval: 30
+      label-enabled: config.spring.io/enabled
+      label-register: condfig.spring.io/register
+      primary-port-name: primary_port
   client:
     registerWithEureka: false
     fetchRegistry: false
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
     healthcheck:
-      enabled: true
+      enabled: false
     lease:
       duration: 5
   instance:
@@ -27,16 +34,40 @@ eureka:
     lease-renewal-interval-in-seconds: 30      # heartbeats frequency to renew instance registration (default 30 seconds)
     lease-expiration-duration-in-seconds: 40   # server to wait this long for a client heartbeat before removing it
 
-
 logging:
   level:
     com.netflix.eureka: OFF
     com.netflix.discovery: OFF
     io.fabric8.kubernetes.client.informers.cache: OFF
 
-k8s:
-  informer:
-    watcher-interval: 30
-    label-enabled: config.spring.io/enabled
-    label-register: condfig.spring.io/register
-    primary-port-name: primary_port
+dekorate:
+  kubernetes:
+    name: springcloud-eureka-controller
+#    server-type: ClusterIP
+    liveness-probe:
+      http-action-path: /actuator/health
+    readiness-probe:
+      http-action-path: /actuator/health
+      period-seconds: 4
+    env-vars:
+      - name: SPRING_PROFILES_ACTIVE
+        value: kubernetes
+    expose: false
+    image-pull-policy: IfNotPresent
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info,health
+---
+spring:
+    profiles: kubernetes
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: eureka-service.default.svc.cluster.local:8761/eureka/
+  instance:
+    hostname: eureka-service.default.svc.cluster.local
+
