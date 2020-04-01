@@ -59,7 +59,7 @@ spec:
   selector:
     name: eureka-server
     version: 0.0.1-SNAPSHOT
-  type: NodePort
+  type: LoadBalancer
 
 ---
 apiVersion: apps/v1
@@ -163,6 +163,7 @@ spec:
         name: springcloud-eureka-controller
         version: 0.0.1-SNAPSHOT
     spec:
+      serviceAccountName: springcloud-eureka-controller
       containers:
         - name: springcloud-eureka-controller
           image: haybu/spring-cloud-k8s-eureka-controller:v7
@@ -188,24 +189,4 @@ spec:
               cpu: 0.5m
             limits:
               memory: 2Gi
-      serviceAccountName: springcloud-eureka-controller
-#        livenessProbe:
-#          failureThreshold: 3
-#          httpGet:
-#            path: /actuator/health
-#            port: 8181
-#            scheme: HTTP
-#          initialDelaySeconds: 0
-#          periodSeconds: 30
-#          successThreshold: 1
-#          timeoutSeconds: 10
-#        readinessProbe:
-#          failureThreshold: 3
-#          httpGet:
-#            path: /actuator/health
-#            port: 8181
-#            scheme: HTTP
-#          initialDelaySeconds: 0
-#          periodSeconds: 4
-#          successThreshold: 1
-#          timeoutSeconds: 10
+

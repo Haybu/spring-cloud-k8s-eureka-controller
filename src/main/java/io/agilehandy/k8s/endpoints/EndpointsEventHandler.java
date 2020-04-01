@@ -27,7 +27,6 @@ import io.agilehandy.k8s.common.CommonInformerProperties;
 import io.agilehandy.k8s.common.CommonUtil;
 import io.agilehandy.k8s.eureka.Application;
 import io.agilehandy.k8s.eureka.Eureka;
-import io.agilehandy.k8s.eureka.Registration;
 import io.fabric8.kubernetes.api.model.EndpointAddress;
 import io.fabric8.kubernetes.api.model.EndpointPort;
 import io.fabric8.kubernetes.api.model.EndpointSubset;
@@ -66,7 +65,7 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 				&& !cache.exists(ep)
 		) {
 			cache.addToCache(ep);
-			List<Registration> registrations = this.register(ep);
+			this.register(ep);
 			logger.info("{} spring endpoint is added", logEndpoints(ep));
 		}
 	}
@@ -97,17 +96,8 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 		}
 	}
 
-	private List<Registration> register(Endpoints ep) {
-		List<Application> applications = this.getApplications(ep);
-		List<Registration> registrations = new ArrayList<>();
-		for (Application app: applications) {
-			InstanceInfo instanceInfo = this.lite.register(app);
-			Registration registration = new Registration();
-			registration.setApplication(app);
-			registration.update(instanceInfo);
-			registrations.add(registration);
-		}
-		return registrations;
+	private void register(Endpoints ep) {
+		this.getApplications(ep).stream().forEach(this.lite::register);
 	}
 
 	private void unregister(Endpoints ep) {
@@ -155,6 +145,7 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 
 	// Find first defined endPoint port.
 	// If a primary port is defined it would be considered
+	// leveraging function in spring-cloud-kubernetes project
 	private EndpointPort findEndpointPort(EndpointSubset s) {
 		List<EndpointPort> ports = s.getPorts();
 		EndpointPort endpointPort;
