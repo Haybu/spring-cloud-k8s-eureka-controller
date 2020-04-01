@@ -67,7 +67,7 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 		) {
 			cache.addToCache(ep);
 			List<Registration> registrations = this.register(ep);
-			logger.debug("{} spring endpoint is added", logEndpoints(ep));
+			logger.info("{} spring endpoint is added", logEndpoints(ep));
 		}
 	}
 
@@ -81,7 +81,7 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 			cache.removeFromCache(oldep);
 			cache.addToCache(newep);
 			renewLease(newep);
-			logger.debug("{} spring endpoint is updated", logEndpoints(oldep));
+			logger.info("{} spring endpoint is updated", logEndpoints(oldep));
 		}
 	}
 
@@ -93,7 +93,7 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 		) {
 			cache.removeFromCache(ep);
 			this.unregister(ep);
-			logger.debug("{} spring endpoint is deleted", logEndpoints(ep));
+			logger.info("{} spring endpoint is deleted", logEndpoints(ep));
 		}
 	}
 
@@ -215,6 +215,11 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 				}
 			}
 			signature.put(ep.getMetadata().getName(), instanceIds);
+		}
+		else {
+			logger.info("cannot obtain subsets of endpoint {}"
+						, ep.getMetadata().getName()
+			);
 		}
 		return signature;
 	}

@@ -38,7 +38,7 @@ logging:
   level:
     com.netflix.eureka: OFF
     com.netflix.discovery: OFF
-    io.fabric8.kubernetes.client.informers.cache: OFF
+    io.fabric8.kubernetes.client.informers.cache: INFO
 
 dekorate:
   kubernetes:
@@ -59,7 +59,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: info,health
+        include: '*'
 ---
 spring:
     profiles: kubernetes
@@ -67,7 +67,7 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: eureka-service.default.svc.cluster.local:8761/eureka/
+      defaultZone: ${EUREKA_SERVICE_URL_DEFAULT_ZONE}
   instance:
-    hostname: eureka-service.default.svc.cluster.local
+    hostname: ${EUREKA_SERVER_SERVICE_HOST:localhost}
 

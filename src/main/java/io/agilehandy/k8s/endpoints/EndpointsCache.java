@@ -61,13 +61,8 @@ public class EndpointsCache {
 		return cache.contains(ep.getMetadata().getResourceVersion());
 	}
 
-	public boolean isSame(Endpoints ep1, Endpoints ep2) {
-		return ep1.getMetadata().getResourceVersion()
-				== ep2.getMetadata().getResourceVersion();
-	}
-
 	public boolean updatedEndpointsInCache(Endpoints oldep, Endpoints newep) {
-		return isSame(oldep, newep) && exists(oldep) && exists(newep);
+		return oldep.equals(newep) && exists(oldep) && exists(newep);
 	}
 
 	public void removeFromCache(Endpoints ep) {

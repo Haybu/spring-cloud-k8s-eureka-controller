@@ -61,13 +61,8 @@ public class ServiceCache {
 		return cache.contains(service.getMetadata().getResourceVersion());
 	}
 
-	public boolean isSame(Service s1, Service s2) {
-		return s1.getMetadata().getResourceVersion()
-				== s2.getMetadata().getResourceVersion();
-	}
-
 	public boolean updatedServiceInCache(Service oldservice, Service newservice) {
-		return isSame(oldservice, newservice)
+		return oldservice.equals(newservice)
 				&& exists(oldservice) && exists(newservice);
 	}
 
