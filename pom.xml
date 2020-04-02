@@ -21,17 +21,6 @@
 	</properties>
 
 	<dependencies>
-		<!--<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.json</groupId>
-					<artifactId>json</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>-->
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -69,11 +58,6 @@
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 			<version>${spring-cloud-netflix.version}</version>
 		</dependency>
-		<!--<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
-			<version>${spring-cloud-netflix.version}</version>
-		</dependency>-->
 
 		<dependency>
 			<groupId>io.fabric8</groupId>
