@@ -32,20 +32,11 @@ import org.springframework.context.annotation.Lazy;
 @Configuration
 @EnableConfigurationProperties
 public class EurekaLiteConfiguration {
-	//@Bean
-	public EurekaLiteProperties eurekaLiteProperties() {
-		return new EurekaLiteProperties();
-	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	public Eureka eureka(InetUtils inetUtils, @Lazy CloudEurekaClient eurekaClient, @Lazy EurekaClientConfigBean clientConfig) {
 		return new Eureka(inetUtils, eurekaClient, clientConfig);
-	}
-
-	//@Bean
-	public EurekaLiteController eurekaLiteController(Eureka eureka, EurekaLiteProperties properties) {
-		return new EurekaLiteController(eureka, properties);
 	}
 
 }
