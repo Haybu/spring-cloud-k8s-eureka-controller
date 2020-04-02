@@ -8,30 +8,24 @@ to register kubernetes services' endpoints with a Eureka Server.
 A service needs to be labeled with `cloud.spring.io/enabled: "true"` to be picked 
 up and with `cloud.spring.io/register: "true"` to enable it to register.
 
-Run the manifest file as below to install the controller and 
-a Eureka server
+### Installation
 
 ```bash
+### install the controller and a Eureka server
 $ kubectl create -f ./deploy/manifest_kubernetes.yaml
-```
 
-Create a sample service and note that it's registered with Eureka
+### To access the Eureka server check the exposed services IP:port in your cluster
+$ kubectl get services
 
-```bash
+### create the provided sample service and note that it's registered with Eureka
 $ kubectl create -f ./sample/examle.yaml
-```
-
-To access the Eureka server check the exposed services IP:port in your cluster
-
-```bash
-$ kubectl get svc
 ```
 
 #### Trying locally using Minikube
 
 If you are running a local Minikube, you would need
 to change the Eureka service in the manifest to be of "NodePort" type (and the example also).
-And to find out a service URL in minikube use ``` minikube service eureka-server --url```
+And to find out a service URL in Minikube use ``` minikube service eureka-server --url```
 
 #### Trying it in Google Cloud Platform
 
