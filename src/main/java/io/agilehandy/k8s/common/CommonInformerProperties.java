@@ -25,8 +25,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class CommonInformerProperties {
 
 	private int watcherInterval = 30;
-	private String labelEnabled = "config.spring.io/enabled";
-	private String labelRegister = "condfig.spring.io/register";
+	private String labelEnabled = "cloud.spring.io/enabled";
+	private String labelRegister = "cloud.spring.io/register";
 	private String primaryPortName = "primary_port";
 
 	public String getLabelEnabled() {

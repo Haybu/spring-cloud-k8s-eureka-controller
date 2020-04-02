@@ -78,7 +78,7 @@ public class EndpointsCache {
 		logger.debug("Start syncing cache.");
 		lister.list()
 				.stream()
-				.filter(ep -> CommonUtil.isSpringLabeled(ep.getMetadata(), properties.getLabelEnabled()))
+				.filter(ep -> CommonUtil.isEnabledLabel(ep.getMetadata(), properties.getLabelEnabled()))
 				.forEach(ep -> cache.add(ep.getMetadata().getResourceVersion()))
 		;
 		logger.debug("Cache is sync with {} endpoints", cache.size());

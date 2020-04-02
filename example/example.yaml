@@ -5,18 +5,15 @@ metadata:
   name: nginx
   labels:
     app: nginx
-    config.spring.io/enabled: "true"
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: nginx
-      config.spring.io/enabled: "true"
   template:
     metadata:
       labels:
         app: nginx
-        config.spring.io/enabled: "true"
     spec:
       containers:
         - name: nginx
@@ -30,11 +27,11 @@ kind: Service
 metadata:
   name: nginx
   labels:
-    config.spring.io/enabled: "true"
+    cloud.spring.io/enabled: "true"
+    cloud.spring.io/register: "true"
 spec:
   selector:
     app: nginx
-    config.spring.io/enabled: "true"
   ports:
     - protocol: TCP
       port: 80

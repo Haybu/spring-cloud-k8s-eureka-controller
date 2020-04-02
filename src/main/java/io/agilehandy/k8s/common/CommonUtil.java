@@ -22,7 +22,7 @@ import io.fabric8.kubernetes.api.model.ObjectMeta;
  **/
 public class CommonUtil {
 
-	static public boolean isSpringLabeled(ObjectMeta metadata, String label) {
+	static public boolean isEnabledLabel(ObjectMeta metadata, String label) {
 		String cfg = metadata.getLabels() != null?
 				metadata.getLabels().containsKey(label)?
 						metadata.getLabels().get(label):"false"

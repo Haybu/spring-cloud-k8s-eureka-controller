@@ -5,7 +5,7 @@ to register services' endpoints into a Eureka Server.
 
 ![eureka controller](./images/k8s-eureka-controller.png)
 
-A service needs to be labeled with `config.spring.io/enabled: "true"` 
+A service needs to be labeled with `cloud.spring.io/enabled: "true"` 
 in order to be considered for registration.
 
 Run the manifest file as below to install the controller and 

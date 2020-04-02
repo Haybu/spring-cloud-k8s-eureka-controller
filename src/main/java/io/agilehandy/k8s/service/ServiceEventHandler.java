@@ -44,7 +44,7 @@ public class ServiceEventHandler implements ResourceEventHandler<Service> {
 	@Override
 	public void onAdd(Service service) {
 		if (cache.isSynced()
-				&& CommonUtil.isSpringLabeled(service.getMetadata(), properties.getLabelEnabled())
+				&& CommonUtil.isEnabledLabel(service.getMetadata(), properties.getLabelEnabled())
 				&& !cache.exists(service)
 		) {
 			cache.addToCache(service);
@@ -56,8 +56,8 @@ public class ServiceEventHandler implements ResourceEventHandler<Service> {
 	@Override
 	public void onUpdate(Service oldservice, Service newservice) {
 		if (cache.isSynced()
-				&& CommonUtil.isSpringLabeled(oldservice.getMetadata(), properties.getLabelEnabled())
-				&& CommonUtil.isSpringLabeled(newservice.getMetadata(), properties.getLabelEnabled())
+				&& CommonUtil.isEnabledLabel(oldservice.getMetadata(), properties.getLabelEnabled())
+				&& CommonUtil.isEnabledLabel(newservice.getMetadata(), properties.getLabelEnabled())
 				&& !cache.updatedServiceInCache(oldservice, newservice)
 		) {
 			cache.removeFromCache(oldservice);
@@ -70,7 +70,7 @@ public class ServiceEventHandler implements ResourceEventHandler<Service> {
 	@Override
 	public void onDelete(Service service, boolean deletedFinalStateUnknown) {
 		if (cache.isSynced()
-				&& CommonUtil.isSpringLabeled(service.getMetadata(), properties.getLabelEnabled())
+				&& CommonUtil.isEnabledLabel(service.getMetadata(), properties.getLabelEnabled())
 				&& cache.exists(service)
 		) {
 			cache.removeFromCache(service);

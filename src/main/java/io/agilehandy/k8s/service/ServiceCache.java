@@ -79,7 +79,7 @@ public class ServiceCache {
 		logger.debug("Start syncing cache.");
 		lister.list()
 				.stream()
-				.filter(service -> CommonUtil.isSpringLabeled(service.getMetadata(), properties.getLabelEnabled()))
+				.filter(service -> CommonUtil.isEnabledLabel(service.getMetadata(), properties.getLabelEnabled()))
 				.forEach(service -> cache.add(service.getMetadata().getResourceVersion()))
 		;
 		logger.debug("Cache is sync with {} services", cache.size());

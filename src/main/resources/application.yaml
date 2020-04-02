@@ -16,8 +16,8 @@ eureka:
   k8s:
     proxy:
       watcher-interval: 30
-      label-enabled: config.spring.io/enabled
-      label-register: condfig.spring.io/register
+      label-enabled: cloud.spring.io/enabled
+      label-register: cloud.spring.io/register
       primary-port-name: primary_port
   client:
     registerWithEureka: false
@@ -38,7 +38,7 @@ logging:
   level:
     com.netflix.eureka: OFF
     com.netflix.discovery: OFF
-    io.fabric8.kubernetes.client.informers.cache: INFO
+    io.fabric8.kubernetes.client.informers.cache: OFF
 
 dekorate:
   kubernetes:

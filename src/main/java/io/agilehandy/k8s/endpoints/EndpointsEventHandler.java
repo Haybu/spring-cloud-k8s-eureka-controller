@@ -61,54 +61,65 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 	@Override
 	public void onAdd(Endpoints ep) {
 		if (cache.isSynced()
-				&& CommonUtil.isSpringLabeled(ep.getMetadata(), properties.getLabelEnabled())
+				&& CommonUtil.isEnabledLabel(ep.getMetadata(), properties.getLabelEnabled())
 				&& !cache.exists(ep)
 		) {
 			cache.addToCache(ep);
 			this.register(ep);
-			logger.info("{} spring endpoint is added", logEndpoints(ep));
+			logger.debug("{} spring endpoint is added", logEndpoints(ep));
 		}
 	}
 
 	@Override
 	public void onUpdate(Endpoints oldep, Endpoints newep) {
 		if (cache.isSynced()
-				&& CommonUtil.isSpringLabeled(oldep.getMetadata(), properties.getLabelEnabled())
-				&& CommonUtil.isSpringLabeled(newep.getMetadata(), properties.getLabelEnabled())
+				&& CommonUtil.isEnabledLabel(oldep.getMetadata(), properties.getLabelEnabled())
+				&& CommonUtil.isEnabledLabel(newep.getMetadata(), properties.getLabelEnabled())
 				&& cache.updatedEndpointsInCache(oldep, newep)
 		) {
 			cache.removeFromCache(oldep);
 			cache.addToCache(newep);
 			renewLease(newep);
-			logger.info("{} spring endpoint is updated", logEndpoints(oldep));
+			logger.debug("{} spring endpoint is updated", logEndpoints(oldep));
 		}
 	}
 
 	@Override
 	public void onDelete(Endpoints ep, boolean deletedFinalStateUnknown) {
 		if (cache.isSynced()
-				&& CommonUtil.isSpringLabeled(ep.getMetadata(), properties.getLabelEnabled())
+				&& CommonUtil.isEnabledLabel(ep.getMetadata(), properties.getLabelEnabled())
 				&& cache.exists(ep)
 		) {
 			cache.removeFromCache(ep);
 			this.unregister(ep);
-			logger.info("{} spring endpoint is deleted", logEndpoints(ep));
+			logger.debug("{} spring endpoint is deleted", logEndpoints(ep));
 		}
 	}
 
 	private void register(Endpoints ep) {
-		this.getApplications(ep).stream().forEach(this.lite::register);
+		if (CommonUtil.isEnabledLabel(ep.getMetadata(), properties.getLabelEnabled())) {
+			this.getApplications(ep).stream().forEach(this.lite::register);
+		} else {
+			logger.debug("service registration label is disabled");
+		}
 	}
 
 	private void unregister(Endpoints ep) {
-		List<Application> applications = this.getApplications(ep);
-		for (Application app: applications) {
-			this.lite.cancel(app.getName(), app.getInstance_id());
+		if (CommonUtil.isEnabledLabel(ep.getMetadata(), properties.getLabelEnabled())) {
+			this.getApplications(ep)
+					.stream()
+					.forEach(app -> this.lite.cancel(app.getName(), app.getInstance_id()));
+		} else {
+			logger.debug("service registration label is disabled");
 		}
 	}
 
 	private void renewLease(Endpoints ep) {
-		this.getInstancesInfo(ep).stream().forEach(lite::renew);
+		if (CommonUtil.isEnabledLabel(ep.getMetadata(), properties.getLabelEnabled())) {
+			this.getInstancesInfo(ep).stream().forEach(lite::renew);
+		} else {
+			logger.debug("service registration label is disabled");
+		}
 	}
 
 	private List<InstanceInfo> getInstancesInfo(Endpoints ep) {
