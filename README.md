@@ -21,7 +21,7 @@ $ kubectl get services
 $ kubectl create -f ./sample/examle.yaml
 ```
 
-#### Trying locally using Minikube
+#### Trying it locally using Minikube
 
 If you are running a local Minikube, you would need
 to change the Eureka service in the manifest to be of "NodePort" type (and the example also).
