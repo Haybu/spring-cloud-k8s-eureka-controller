@@ -163,7 +163,7 @@ spec:
       serviceAccountName: springcloud-eureka-controller
       containers:
         - name: springcloud-eureka-controller
-          image: haybu/spring-cloud-k8s-eureka-controller:v9
+          image: haybu/spring-cloud-k8s-eureka-controller:v10
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8181
@@ -178,8 +178,6 @@ spec:
               value: kubernetes
             - name: EUREKA_SERVICE_URL_DEFAULT_ZONE
               value: "http://eureka-server.default.svc.cluster.local/eureka/"
-            - name: MANAGEMENT_ENPOINTS_WEB_EXPOSURE_INCLUDE
-              value: info,health,env
           resources:
             requests:
               memory: 1Gi

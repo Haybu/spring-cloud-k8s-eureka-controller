@@ -43,23 +43,14 @@ logging:
 dekorate:
   kubernetes:
     name: springcloud-eureka-controller
-#    server-type: ClusterIP
-    liveness-probe:
-      http-action-path: /actuator/health
-    readiness-probe:
-      http-action-path: /actuator/health
-      period-seconds: 4
     env-vars:
       - name: SPRING_PROFILES_ACTIVE
         value: kubernetes
+      - name: EUREKA_SERVICE_URL_DEFAULT_ZONE
+        value: "http://eureka-server.default.svc.cluster.local/eureka/"
     expose: false
     image-pull-policy: IfNotPresent
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
 ---
 spring:
     profiles: kubernetes
