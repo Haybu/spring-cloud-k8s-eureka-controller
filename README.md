@@ -15,7 +15,7 @@ a Eureka server
 $ kubectl create -f ./deploy/manifest_kubernetes.yaml
 ```
 
-Create a sample service and note that it register in Eureka
+Create a sample service and note that it's registered with Eureka
 
 ```bash
 $ kubectl create -f ./sample/examle.yaml
@@ -28,5 +28,5 @@ $ kubectl get svc
 ```
 
 If you are running a local cluster such as Minikube, you would need
-to change the Eureka service in the manifest to be of "NodePort" type.
-And note the service URL using ``` minikube service eureka-server --url```
+to change the Eureka service in the manifest to be of "NodePort" type (and the example also).
+And to find out a service URL in minikube use ``` minikube service eureka-server --url```
