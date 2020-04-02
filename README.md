@@ -1,12 +1,12 @@
 # Spring Cloud Service Registry Controller
 
 A Kubernetes controller implementation using Fabric8 Java-Client as a proxy
-to register services' endpoints into a Eureka Server. 
+to register kubernetes services' endpoints with a Eureka Server. 
 
 ![eureka controller](./images/k8s-eureka-controller.png)
 
 A service needs to be labeled with `cloud.spring.io/enabled: "true"` to be picked 
-and `cloud.spring.io/register: "true"` to enable it to register.
+up and with `cloud.spring.io/register: "true"` to enable it to register.
 
 Run the manifest file as below to install the controller and 
 a Eureka server
