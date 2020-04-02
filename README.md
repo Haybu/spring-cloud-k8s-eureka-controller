@@ -59,7 +59,7 @@ $ kubectl get services
 ### run the example and check if the service is registered with eureka
 $ kubectl create -f ./sample/examle.yaml
 
-### clean 
+### clean up
 $ gcloud container clusters delete mycluster
 
 ```
