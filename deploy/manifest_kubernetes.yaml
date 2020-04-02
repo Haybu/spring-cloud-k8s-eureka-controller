@@ -163,7 +163,7 @@ spec:
       serviceAccountName: springcloud-eureka-controller
       containers:
         - name: springcloud-eureka-controller
-          image: haybu/spring-cloud-k8s-eureka-controller:v8
+          image: haybu/spring-cloud-k8s-eureka-controller:v9
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8181
