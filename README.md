@@ -27,6 +27,39 @@ To access the Eureka server check the exposed services IP:port in your cluster
 $ kubectl get svc
 ```
 
-If you are running a local cluster such as Minikube, you would need
+#### Trying locally using Minikube
+
+If you are running a local Minikube, you would need
 to change the Eureka service in the manifest to be of "NodePort" type (and the example also).
 And to find out a service URL in minikube use ``` minikube service eureka-server --url```
+
+#### Trying it in Google Cloud Platform
+
+Provided you have a GCP account, `gcloud` cli installed, and authenticated `(using: gcloud auth login)`.
+
+```sbtshell
+### create a cluster
+$ gcloud container clusters create mycluster --cluster-version=latest --zone us-central1-a
+
+### set gcloud config with default cluster
+$ gcloud config set container/cluster mycluster
+
+### get k8s credentials
+$ gcloud container clusters get-credentials mycluster --zone us-central1-a
+
+### Check you can access the cluster
+$ kubectl cluster-info
+
+### install the registry proxy controller and a eureka server
+$ kubectl create -f ./deploy/manifest_kubernetes.yaml
+
+### note the external IP of the eureka server
+$ kubectl get services
+
+### run the example and check if the service is registered with eureka
+$ kubectl create -f ./sample/examle.yaml
+
+### clean 
+$ gcloud container clusters delete mycluster
+
+```
