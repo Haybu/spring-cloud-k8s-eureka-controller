@@ -23,9 +23,11 @@ $ kubectl create -f ./sample/examle.yaml
 
 #### Trying it locally using Minikube
 
-If you are running a local Minikube, you would need
-to change the Eureka service in the manifest to be of "NodePort" type (and the example also).
-And to find out a service URL in Minikube use ``` minikube service eureka-server --url```
+If you are running a local Minikube
+ 
+* to use RBAC start Minikube with `--extra-config=apiserver.Authorization.Mode=RBAC` option 
+* you would need to change the Eureka service in the manifest to be of "NodePort" type (and the example also).
+* after installation, to find out a service URL in Minikube use ``` minikube service eureka-server --url```
 
 #### Trying it in Google Cloud Platform
 
@@ -54,6 +56,5 @@ $ kubectl get services
 $ kubectl create -f ./sample/examle.yaml
 
 ### clean up
-$ gcloud container clusters delete mycluster
-
+$ gcloud container clusters delete mycluster --zone us-central1-a
 ```
