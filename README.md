@@ -58,3 +58,14 @@ $ kubectl create -f ./example/examle.yaml
 ### clean up
 $ gcloud container clusters delete mycluster --zone us-central1-a
 ```
+
+#### Demo
+
+A demo in this [repo](https://github.com/Haybu/demo-springcloud-k8s-svc-registry) has two services, a backend-service and a frontend-service.
+
+The backend-service is to be deployed as a kubernetes internal service,
+and the front-service is to be deployed as an exposed kubernetes service.
+
+The backend-service is enabled (in the manifest) to register with the deployed Eureka server,
+and the frontend-service uses a client-side loadbalancer to call 
+a backend-service instance discovered from the Eureka server.
