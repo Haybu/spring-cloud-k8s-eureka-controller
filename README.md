@@ -18,7 +18,7 @@ $ kubectl create -f ./deploy/manifest_kubernetes.yaml
 $ kubectl get services
 
 ### create the provided sample service and note that it's registered with Eureka
-$ kubectl create -f ./sample/examle.yaml
+$ kubectl create -f ./example/examle.yaml
 ```
 
 #### Trying it locally using Minikube
