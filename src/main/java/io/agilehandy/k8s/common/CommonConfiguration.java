@@ -20,6 +20,8 @@ import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.informers.SharedInformerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,9 +33,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CommonConfiguration {
 
+	private static Logger logger = LoggerFactory.getLogger(CommonConfiguration.class);
+
 	@Bean
-	public Config config() {
-		return new ConfigBuilder().build();
+	public Config config(CommonInformerProperties properties) {
+		Config config = new ConfigBuilder().build();
+		config.setNamespace(properties.getNamespace());
+		logger.info("Default kubernetes namespace: " + config.getNamespace());
+		return config;
 	}
 
 	@Bean

@@ -29,6 +29,8 @@ public class CommonInformerProperties {
 	private String labelRegister = "cloud.spring.io/register";
 	private String primaryPortName = "primary_port";
 
+	private String namespace = "default";
+
 	public String getLabelEnabled() {
 		return labelEnabled;
 	}
@@ -61,4 +63,11 @@ public class CommonInformerProperties {
 		this.primaryPortName = primaryPortName;
 	}
 
+	public String getNamespace() {
+		return namespace;
+	}
+
+	public void setNamespace(String namespace) {
+		this.namespace = namespace;
+	}
 }

@@ -18,8 +18,6 @@ package io.agilehandy.k8s.service;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import javax.annotation.PostConstruct;
-
 import io.agilehandy.k8s.common.CommonInformerProperties;
 import io.agilehandy.k8s.common.CommonUtil;
 import io.fabric8.kubernetes.api.model.Service;
@@ -28,6 +26,8 @@ import io.fabric8.kubernetes.client.informers.cache.Lister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  **/
 
 @Component
-public class ServiceCache {
+public class ServiceCache implements InitializingBean {
 
 	private static Logger logger = LoggerFactory.getLogger(ServiceCache.class);
 
@@ -48,7 +48,9 @@ public class ServiceCache {
 
 	private boolean synced;
 
-	public ServiceCache(KubernetesClient client, CommonInformerProperties properties, Lister<Service> lister) {
+	public ServiceCache(KubernetesClient client
+			, CommonInformerProperties properties
+			, @Qualifier("servicesLister") Lister<Service> lister) {
 		this.client = client;
 		this.properties = properties;
 		this.lister = lister;
@@ -74,15 +76,15 @@ public class ServiceCache {
 		cache.add(service.getMetadata().getResourceVersion());
 	}
 
-	@PostConstruct
-	private void boostrapCache() {
+	@Override
+	public void afterPropertiesSet() throws Exception {
 		logger.debug("Start syncing cache.");
 		lister.list()
 				.stream()
 				.filter(service -> CommonUtil.isEnabledLabel(service.getMetadata(), properties.getLabelEnabled()))
 				.forEach(service -> cache.add(service.getMetadata().getResourceVersion()))
 		;
-		logger.debug("Cache is sync with {} services", cache.size());
+		logger.debug("Cache is synced with {} services", cache.size());
 		synced = true;
 	}
 

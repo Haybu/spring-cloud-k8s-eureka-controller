@@ -22,7 +22,7 @@ metadata:
 rules:
   - apiGroups: ["", "extensions", "apps"]
     resources: ["pods", "services", "endpoints", "deployments"]
-    verbs: ["*"]
+    verbs: ["get", "list", "watch"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -163,7 +163,7 @@ spec:
       serviceAccountName: springcloud-eureka-controller
       containers:
         - name: springcloud-eureka-controller
-          image: haybu/spring-cloud-k8s-eureka-controller:v10
+          image: haybu/spring-cloud-k8s-eureka-controller:v12
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8181

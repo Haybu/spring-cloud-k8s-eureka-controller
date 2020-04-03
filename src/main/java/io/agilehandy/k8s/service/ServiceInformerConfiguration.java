@@ -23,6 +23,7 @@ import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 import io.fabric8.kubernetes.client.informers.SharedInformerFactory;
 import io.fabric8.kubernetes.client.informers.cache.Lister;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -33,21 +34,16 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ServiceInformerConfiguration {
 
-	private final CommonInformerProperties properties;
-
-	public ServiceInformerConfiguration(CommonInformerProperties properties) {
-		this.properties = properties;
-	}
-
-	@Bean(name="serviceSharedIndexInfromer")
-	public SharedIndexInformer<Service> serviceSharedIndexInformer(SharedInformerFactory factory) {
+	@Bean(name="servicesSharedInformer")
+	public SharedIndexInformer<Service> serviceSharedIndexInformer(CommonInformerProperties properties
+			, SharedInformerFactory factory) {
 		return factory.sharedIndexInformerFor(Service.class
 				, ServiceList.class
 				, properties.getWatcherInterval() * 1000L);
 	}
 
-	@Bean(name="serviceLister")
-	public Lister<Service> serviceLister(SharedIndexInformer<Service> informer
+	@Bean(name="servicesLister")
+	public Lister<Service> serviceLister(@Qualifier("servicesSharedInformer") SharedIndexInformer<Service> informer
 			, KubernetesClient client) {
 		return new Lister(informer.getIndexer()
 				, client.getNamespace());

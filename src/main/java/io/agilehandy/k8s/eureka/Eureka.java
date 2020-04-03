@@ -144,7 +144,7 @@ public class Eureka implements ApplicationContextAware {
 		return new TransportClientFactory() {
 			@Override
 			public EurekaHttpClient newClient(EurekaEndpoint serviceUrl) {
-				logger.info("serviceUrl: " + serviceUrl.getServiceUrl());
+				logger.debug("serviceUrl: " + serviceUrl.getServiceUrl());
 				return metricsFactory.newClient(serviceUrl);
 			}
 

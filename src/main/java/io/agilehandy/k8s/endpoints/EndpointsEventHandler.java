@@ -64,9 +64,9 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 				&& CommonUtil.isEnabledLabel(ep.getMetadata(), properties.getLabelEnabled())
 				&& !cache.exists(ep)
 		) {
+			logger.info("Add Endpoint Action -> {}", logEndpoints(ep, false));
+			//register(ep);  // too early to register now
 			cache.addToCache(ep);
-			this.register(ep);
-			logger.debug("{} spring endpoint is added", logEndpoints(ep));
 		}
 	}
 
@@ -75,12 +75,16 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 		if (cache.isSynced()
 				&& CommonUtil.isEnabledLabel(oldep.getMetadata(), properties.getLabelEnabled())
 				&& CommonUtil.isEnabledLabel(newep.getMetadata(), properties.getLabelEnabled())
-				&& cache.updatedEndpointsInCache(oldep, newep)
+				&& cache.same(oldep, newep)
 		) {
-			cache.removeFromCache(oldep);
-			cache.addToCache(newep);
-			renewLease(newep);
-			logger.debug("{} spring endpoint is updated", logEndpoints(oldep));
+			logger.info("Update Endpoint Action (old) -> {}", logEndpoints(oldep, true));
+			logger.info("Update Endpoint Action (new) -> {}", logEndpoints(newep, true));
+			if (cache.updateExisting(oldep, newep)) {
+				register(newep);
+			} else if (cache.pollingExisting(oldep, newep)){
+				renewLease(newep);
+			}
+			cache.replace(oldep, newep);
 		}
 	}
 
@@ -90,9 +94,9 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 				&& CommonUtil.isEnabledLabel(ep.getMetadata(), properties.getLabelEnabled())
 				&& cache.exists(ep)
 		) {
+			logger.info("Delete Endpoint Action -> {}", logEndpoints(ep, true));
+			unregister(ep);
 			cache.removeFromCache(ep);
-			this.unregister(ep);
-			logger.debug("{} spring endpoint is deleted", logEndpoints(ep));
 		}
 	}
 
@@ -149,6 +153,10 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 							instanceId, endpointAddress.getIp(), endpointPort.getPort()));
 				}
 			}
+		} else {
+			logger.info("subsets are not available now for endpoint {} (pods may not be created yet)"
+					, ep.getMetadata().getName()
+			);
 		}
 
 		return applications;
@@ -179,21 +187,25 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 	}
 
 	// ------------ for logging purpose ---------------------
-	private String logEndpoints(Endpoints ep) {
+	private String logEndpoints(Endpoints ep, boolean extraInfo) {
 		StringBuilder sb = new StringBuilder("namespace: "  + ep.getMetadata().getNamespace());
-		sb.append("\tendpoint name: " + ep.getMetadata().getName());
-		Map<String, Map<String, String>> map = this.endpointInstanceIds(ep);
-		map.entrySet().stream().forEach(entry -> {
-			String serviceName = entry.getKey();
-			sb.append("\tserviceName: " + serviceName);
-			Map<String, String> instances = entry.getValue();
-			instances.entrySet().stream().forEach(e -> {
-				String instanceId = e.getKey();
-				String hostPort = e.getValue();
-				sb.append("\t[serviceId: " + instanceId);
-				sb.append("\thost:port: " + hostPort + "]");
+		sb.append(", name: " + ep.getMetadata().getName());
+		sb.append(", version: " + ep.getMetadata().getResourceVersion());
+		sb.append(", uid: " + ep.getMetadata().getUid());
+		if (extraInfo) {
+			Map<String, Map<String, String>> map = this.endpointInstanceIds(ep);
+			map.entrySet().stream().forEach(entry -> {
+				String serviceName = entry.getKey();
+				sb.append(", serviceName: " + serviceName);
+				Map<String, String> instances = entry.getValue();
+				instances.entrySet().stream().forEach(e -> {
+					String instanceId = e.getKey();
+					String hostPort = e.getValue();
+					sb.append(", [serviceId: " + instanceId);
+					sb.append(", host:port: " + hostPort + "]");
+				});
 			});
-		});
+		}
 		return sb.toString();
 	}
 
@@ -219,7 +231,7 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 			signature.put(ep.getMetadata().getName(), instanceIds);
 		}
 		else {
-			logger.info("cannot obtain subsets of endpoint {}"
+			logger.info("subsets are not available now for endpoint {} (pods may not be created yet)"
 						, ep.getMetadata().getName()
 			);
 		}
