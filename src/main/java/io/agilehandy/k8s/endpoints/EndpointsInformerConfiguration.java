@@ -47,7 +47,7 @@ public class EndpointsInformerConfiguration {
 		if(!properties.getNamespace().equalsIgnoreCase("all-namespaces")) {
 			config.setNamespace(properties.getNamespace());
 		}
-		logger.info("Default kubernetes namespace: " + config.getNamespace());
+		logger.debug("Default kubernetes namespace: " + config.getNamespace());
 		return config;
 	}
 

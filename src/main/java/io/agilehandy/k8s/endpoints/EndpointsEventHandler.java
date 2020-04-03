@@ -63,7 +63,7 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 		if (Util.isEnabledLabel(ep.getMetadata(), properties.getLabelEnabled())
 				&& !cache.exists(ep)
 		) {
-			logger.info("Add Endpoint Action -> {}", logEndpoints(ep, false));
+			logger.debug("Add Endpoint Action -> {}", logEndpoints(ep, false));
 			cache.addToCache(ep);
 		}
 	}
@@ -74,8 +74,8 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 				&& Util.isEnabledLabel(newep.getMetadata(), properties.getLabelEnabled())
 				&& cache.exists(oldep)
 		) {
-			logger.info("Update Endpoint Action (old) -> {}", logEndpoints(oldep, true));
-			logger.info("Update Endpoint Action (new) -> {}", logEndpoints(newep, true));
+			logger.debug("Update Endpoint Action (old) -> {}", logEndpoints(oldep, true));
+			logger.debug("Update Endpoint Action (new) -> {}", logEndpoints(newep, true));
 			if (cache.updateExisting(oldep, newep)) {
 				register(newep);
 			} else if (cache.pollingExisting(oldep, newep)){
@@ -90,25 +90,25 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 		if (Util.isEnabledLabel(ep.getMetadata(), properties.getLabelEnabled())
 				&& cache.exists(ep)
 		) {
-			logger.info("Delete Endpoint Action -> {}", logEndpoints(ep, true));
+			logger.debug("Delete Endpoint Action -> {}", logEndpoints(ep, true));
 			unregister(ep);
 			cache.removeFromCache(ep);
 		}
 	}
 
 	private void register(Endpoints ep) {
-		logger.info("handler::registering " + ep.getMetadata().getName()
+		logger.debug("handler::registering " + ep.getMetadata().getName()
 				+ " with uid " + ep.getMetadata().getUid()
 				+ " and version " + ep.getMetadata().getResourceVersion());
 		if (Util.isEnabledLabel(ep.getMetadata(), properties.getLabelRegister())) {
 			this.getApplications(ep).stream().forEach(this.lite::register);
 		} else {
-			logger.info("service registration label is disabled");
+			logger.debug("service registration label is disabled");
 		}
 	}
 
 	private void unregister(Endpoints ep) {
-		logger.info("handler::de-registering " + ep.getMetadata().getName()
+		logger.debug("handler::de-registering " + ep.getMetadata().getName()
 				+ " with uid " + ep.getMetadata().getUid()
 				+ " and version " + ep.getMetadata().getResourceVersion());
 		if (Util.isEnabledLabel(ep.getMetadata(), properties.getLabelRegister())) {
@@ -116,18 +116,18 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 					.stream()
 					.forEach(app -> this.lite.cancel(app.getName(), app.getInstance_id()));
 		} else {
-			logger.info("service registration label is disabled");
+			logger.debug("service registration label is disabled");
 		}
 	}
 
 	private void renewLease(Endpoints ep) {
-		logger.info("handler::re-registering " + ep.getMetadata().getName()
+		logger.debug("handler::re-registering " + ep.getMetadata().getName()
 				+ " with uid " + ep.getMetadata().getUid()
 				+ " and version " + ep.getMetadata().getResourceVersion());
 		if (Util.isEnabledLabel(ep.getMetadata(), properties.getLabelRegister())) {
 			this.getInstancesInfo(ep).stream().forEach(lite::renew);
 		} else {
-			logger.info("service registration label is disabled");
+			logger.debug("service registration label is disabled");
 		}
 	}
 
@@ -145,7 +145,7 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 			for (EndpointSubset subset : subsetsList) {
 				List<EndpointAddress> addresses = subset.getAddresses();
 				for (EndpointAddress endpointAddress : addresses) {
-					logger.info("endpointAddress: {}", endpointAddress.toString());
+					logger.debug("endpointAddress: {}", endpointAddress.toString());
 					String instanceId = null;
 					if (endpointAddress.getTargetRef() != null) {
 						instanceId = endpointAddress.getTargetRef().getUid();
@@ -159,7 +159,7 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 				}
 			}
 		} else {
-			logger.info("subsets are not available now for endpoint {} (pods may not be created yet)"
+			logger.debug("subsets are not available now for endpoint {} (pods may not be created yet)"
 					, ep.getMetadata().getName()
 			);
 		}
@@ -236,7 +236,7 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 			signature.put(ep.getMetadata().getName(), instanceIds);
 		}
 		else {
-			logger.info("subsets are not available now for endpoint {} (pods may not be created yet)"
+			logger.debug("subsets are not available now for endpoint {} (pods may not be created yet)"
 						, ep.getMetadata().getName()
 			);
 		}

@@ -28,6 +28,6 @@ public class EndpointsEventListener implements SharedInformerEventListener {
 
 	@Override
 	public void onException(Exception e) {
-		logger.info("Exception Occur: " + e.getMessage());
+		logger.error("Exception Occur: " + e.getMessage());
 	}
 }

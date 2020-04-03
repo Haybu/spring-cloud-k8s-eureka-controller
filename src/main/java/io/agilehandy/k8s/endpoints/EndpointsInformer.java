@@ -15,6 +15,7 @@
  */
 package io.agilehandy.k8s.endpoints;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -27,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 /**
  * @author Haytham Mohamed
@@ -42,39 +42,41 @@ public class EndpointsInformer {
 	private final EndpointsEventHandler handler;
 	private final SharedInformerFactory factory;
 
+	private ExecutorService executorService;
+
 	public EndpointsInformer(EndpointsEventHandler handler
 			, SharedInformerFactory factory) {
 		this.handler = handler;
 		this.factory = factory;
-		Assert.notNull(this.handler, "---> Handler is null");
-		Assert.notNull(this.factory, "---> factory is null" );
+		executorService = Executors.newSingleThreadExecutor();
 	}
 
 	@PreDestroy
 	public void destroy() {
-		logger.info("Stopping all registered endpoints informers");
+		logger.debug("Stopping all registered endpoints informers");
 		factory.stopAllRegisteredInformers();
-		logger.info("All registered endpoints informers were stopped successfully!");
+		executorService.shutdown();
+		logger.debug("All registered endpoints informers were stopped successfully!");
 	}
 
 	private void wait(SharedIndexInformer<Endpoints> informer) {
 		try {
-			Executors.newSingleThreadExecutor().submit(() -> {
+			executorService.submit(() -> {
 				Thread.currentThread().setName("HAS_SYNCED_THREAD");
 				try {
 					for (;;) {
-						logger.info("informer.hasSynced() : {}", informer.hasSynced());
+						logger.debug("informer.hasSynced() : {}", informer.hasSynced());
 						Thread.sleep(1000);
 					}
 				} catch (InterruptedException inEx) {
-					logger.info("HAS_SYNCED_THREAD INTERRUPTED!");
+					logger.debug("HAS_SYNCED_THREAD INTERRUPTED!");
 				}
 			});
 
 			// Wait for some time now
 			TimeUnit.MINUTES.sleep(1);
 		} catch (InterruptedException interruptedException) {
-			logger.info("-> interrupted: {}", interruptedException.getMessage());
+			logger.debug("-> interrupted: {}", interruptedException.getMessage());
 		}
 	}
 
@@ -82,9 +84,9 @@ public class EndpointsInformer {
 		SharedIndexInformer<Endpoints> informer =
 				factory.getExistingSharedIndexInformer(Endpoints.class);
 		informer.addEventHandler(handler);
-		logger.info("Starting all registered endpoints informers");
+		logger.debug("Starting all registered endpoints informers");
 		factory.startAllRegisteredInformers();
 		wait(informer);
-		logger.info("All registered endpoints informers were started successfully!");
+		logger.debug("All registered endpoints informers were started successfully!");
 	}
 }

@@ -75,12 +75,12 @@ public class EndpointsCache {
 	}
 
 	public void removeFromCache(Endpoints ep) {
-		logger.info("remove from cache: " + ep.getMetadata().getUid());
+		logger.debug("remove from cache: " + ep.getMetadata().getUid());
 		cache.remove(ep.getMetadata().getUid());
 	}
 
 	public void addToCache(Endpoints ep) {
-		logger.info("add to cache: " + ep.getMetadata().getUid());
+		logger.debug("add to cache: " + ep.getMetadata().getUid());
 		cache.add(ep.getMetadata().getUid());
 	}
 
