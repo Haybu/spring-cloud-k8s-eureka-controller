@@ -21,7 +21,7 @@ metadata:
   namespace: default
 rules:
   - apiGroups: ["", "extensions", "apps"]
-    resources: ["pods", "services", "endpoints", "deployments"]
+    resources: ["pods", "services", "endpoints", "deployments", "configmaps", "secrets"]
     verbs: ["get", "list", "watch"]
 
 ---
@@ -163,7 +163,7 @@ spec:
       serviceAccountName: springcloud-eureka-controller
       containers:
         - name: springcloud-eureka-controller
-          image: haybu/spring-cloud-k8s-eureka-controller:v12
+          image: haybu/spring-cloud-k8s-eureka-controller:v17
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8181

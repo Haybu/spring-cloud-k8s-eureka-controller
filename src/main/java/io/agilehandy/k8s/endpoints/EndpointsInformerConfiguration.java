@@ -58,7 +58,9 @@ public class EndpointsInformerConfiguration {
 
 	@Bean
 	public SharedInformerFactory sharedInformerFactory(KubernetesClient client) {
-		return client.informers();
+		SharedInformerFactory factory = client.informers();
+		factory.addSharedInformerEventListener(new EndpointsEventListener());
+		return factory;
 	}
 
 	@Bean(name="endpointsSharedInformer")
