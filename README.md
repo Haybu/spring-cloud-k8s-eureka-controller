@@ -53,7 +53,7 @@ $ kubectl create -f ./deploy/manifest_kubernetes.yaml
 $ kubectl get services
 
 ### run the example and check if the service is registered with eureka
-$ kubectl create -f ./sample/examle.yaml
+$ kubectl create -f ./example/examle.yaml
 
 ### clean up
 $ gcloud container clusters delete mycluster --zone us-central1-a
