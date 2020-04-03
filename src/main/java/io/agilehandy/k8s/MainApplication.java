@@ -8,12 +8,10 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.netflix.eureka.EurekaClientConfigBean;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-@EnableConfigurationProperties(value={InformerProperties.class
-		, EurekaLiteProperties.class, EurekaClientConfigBean.class})
+@EnableConfigurationProperties(value={InformerProperties.class, EurekaLiteProperties.class})
 public class MainApplication {
 
 	public static void main(String[] args) {

@@ -39,6 +39,7 @@ logging:
     com.netflix.eureka: OFF
     com.netflix.discovery: OFF
     io.fabric8.kubernetes.client.informers.cache: OFF
+    io.agilehandy.k8s: OFF
 
 dekorate:
   kubernetes:
