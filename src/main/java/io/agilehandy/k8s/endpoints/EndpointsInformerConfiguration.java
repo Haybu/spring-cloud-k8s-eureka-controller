@@ -15,13 +15,18 @@
  */
 package io.agilehandy.k8s.endpoints;
 
-import io.agilehandy.k8s.common.CommonInformerProperties;
+import io.agilehandy.k8s.common.InformerProperties;
 import io.fabric8.kubernetes.api.model.Endpoints;
 import io.fabric8.kubernetes.api.model.EndpointsList;
+import io.fabric8.kubernetes.client.Config;
+import io.fabric8.kubernetes.client.ConfigBuilder;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 import io.fabric8.kubernetes.client.informers.SharedInformerFactory;
 import io.fabric8.kubernetes.client.informers.cache.Lister;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -34,8 +39,30 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class EndpointsInformerConfiguration {
 
+	private static Logger logger = LoggerFactory.getLogger(EndpointsInformerConfiguration.class);
+
+	@Bean
+	public Config config(InformerProperties properties) {
+		Config config = new ConfigBuilder().build();
+		if(!properties.getNamespace().equalsIgnoreCase("all-namespaces")) {
+			config.setNamespace(properties.getNamespace());
+		}
+		logger.info("Default kubernetes namespace: " + config.getNamespace());
+		return config;
+	}
+
+	@Bean
+	public KubernetesClient client(Config config) {
+		return new DefaultKubernetesClient(config);
+	}
+
+	@Bean
+	public SharedInformerFactory sharedInformerFactory(KubernetesClient client) {
+		return client.informers();
+	}
+
 	@Bean(name="endpointsSharedInformer")
-	public SharedIndexInformer<Endpoints> serviceSharedIndexInformer(CommonInformerProperties properties,
+	public SharedIndexInformer<Endpoints> serviceSharedIndexInformer(InformerProperties properties,
 			SharedInformerFactory factory) {
 		return factory.sharedIndexInformerFor(Endpoints.class, EndpointsList.class
 				, properties.getWatcherInterval() * 1000L);

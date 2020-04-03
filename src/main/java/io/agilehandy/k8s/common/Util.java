@@ -20,7 +20,7 @@ import io.fabric8.kubernetes.api.model.ObjectMeta;
 /**
  * @author Haytham Mohamed
  **/
-public class CommonUtil {
+public class Util {
 
 	static public boolean isEnabledLabel(ObjectMeta metadata, String label) {
 		String cfg = metadata.getLabels() != null?

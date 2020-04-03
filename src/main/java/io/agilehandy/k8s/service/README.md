@@ -1,1 +1,0 @@
-Keep services informer to deal with headless and external services later.

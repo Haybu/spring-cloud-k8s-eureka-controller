@@ -23,8 +23,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.netflix.appinfo.InstanceInfo;
-import io.agilehandy.k8s.common.CommonInformerProperties;
-import io.agilehandy.k8s.common.CommonUtil;
+import io.agilehandy.k8s.common.InformerProperties;
+import io.agilehandy.k8s.common.Util;
 import io.agilehandy.k8s.eureka.Application;
 import io.agilehandy.k8s.eureka.Eureka;
 import io.fabric8.kubernetes.api.model.EndpointAddress;
@@ -49,10 +49,10 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 
 	private final Eureka lite;
 
-	private final CommonInformerProperties properties;
+	private final InformerProperties properties;
 	private final EndpointsCache cache;
 
-	public EndpointsEventHandler(Eureka lite, CommonInformerProperties properties, EndpointsCache cache) {
+	public EndpointsEventHandler(Eureka lite, InformerProperties properties, EndpointsCache cache) {
 		this.lite = lite;
 		this.properties = properties;
 		this.cache = cache;
@@ -60,22 +60,19 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 
 	@Override
 	public void onAdd(Endpoints ep) {
-		if (cache.isSynced()
-				&& CommonUtil.isEnabledLabel(ep.getMetadata(), properties.getLabelEnabled())
+		if (Util.isEnabledLabel(ep.getMetadata(), properties.getLabelEnabled())
 				&& !cache.exists(ep)
 		) {
 			logger.info("Add Endpoint Action -> {}", logEndpoints(ep, false));
-			//register(ep);  // too early to register now
 			cache.addToCache(ep);
 		}
 	}
 
 	@Override
 	public void onUpdate(Endpoints oldep, Endpoints newep) {
-		if (cache.isSynced()
-				&& CommonUtil.isEnabledLabel(oldep.getMetadata(), properties.getLabelEnabled())
-				&& CommonUtil.isEnabledLabel(newep.getMetadata(), properties.getLabelEnabled())
-				&& cache.same(oldep, newep)
+		if (Util.isEnabledLabel(oldep.getMetadata(), properties.getLabelEnabled())
+				&& Util.isEnabledLabel(newep.getMetadata(), properties.getLabelEnabled())
+				&& cache.exists(oldep)
 		) {
 			logger.info("Update Endpoint Action (old) -> {}", logEndpoints(oldep, true));
 			logger.info("Update Endpoint Action (new) -> {}", logEndpoints(newep, true));
@@ -84,14 +81,13 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 			} else if (cache.pollingExisting(oldep, newep)){
 				renewLease(newep);
 			}
-			cache.replace(oldep, newep);
+			//cache.replace(oldep, newep);
 		}
 	}
 
 	@Override
 	public void onDelete(Endpoints ep, boolean deletedFinalStateUnknown) {
-		if (cache.isSynced()
-				&& CommonUtil.isEnabledLabel(ep.getMetadata(), properties.getLabelEnabled())
+		if (Util.isEnabledLabel(ep.getMetadata(), properties.getLabelEnabled())
 				&& cache.exists(ep)
 		) {
 			logger.info("Delete Endpoint Action -> {}", logEndpoints(ep, true));
@@ -101,28 +97,37 @@ public class EndpointsEventHandler implements ResourceEventHandler<Endpoints> {
 	}
 
 	private void register(Endpoints ep) {
-		if (CommonUtil.isEnabledLabel(ep.getMetadata(), properties.getLabelEnabled())) {
+		logger.info("handler::registering " + ep.getMetadata().getName()
+				+ " with uid " + ep.getMetadata().getUid()
+				+ " and version " + ep.getMetadata().getResourceVersion());
+		if (Util.isEnabledLabel(ep.getMetadata(), properties.getLabelRegister())) {
 			this.getApplications(ep).stream().forEach(this.lite::register);
 		} else {
-			logger.debug("service registration label is disabled");
+			logger.info("service registration label is disabled");
 		}
 	}
 
 	private void unregister(Endpoints ep) {
-		if (CommonUtil.isEnabledLabel(ep.getMetadata(), properties.getLabelEnabled())) {
+		logger.info("handler::de-registering " + ep.getMetadata().getName()
+				+ " with uid " + ep.getMetadata().getUid()
+				+ " and version " + ep.getMetadata().getResourceVersion());
+		if (Util.isEnabledLabel(ep.getMetadata(), properties.getLabelRegister())) {
 			this.getApplications(ep)
 					.stream()
 					.forEach(app -> this.lite.cancel(app.getName(), app.getInstance_id()));
 		} else {
-			logger.debug("service registration label is disabled");
+			logger.info("service registration label is disabled");
 		}
 	}
 
 	private void renewLease(Endpoints ep) {
-		if (CommonUtil.isEnabledLabel(ep.getMetadata(), properties.getLabelEnabled())) {
+		logger.info("handler::re-registering " + ep.getMetadata().getName()
+				+ " with uid " + ep.getMetadata().getUid()
+				+ " and version " + ep.getMetadata().getResourceVersion());
+		if (Util.isEnabledLabel(ep.getMetadata(), properties.getLabelRegister())) {
 			this.getInstancesInfo(ep).stream().forEach(lite::renew);
 		} else {
-			logger.debug("service registration label is disabled");
+			logger.info("service registration label is disabled");
 		}
 	}
 

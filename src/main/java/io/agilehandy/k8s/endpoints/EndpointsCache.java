@@ -18,15 +18,13 @@ package io.agilehandy.k8s.endpoints;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import io.agilehandy.k8s.common.CommonInformerProperties;
-import io.agilehandy.k8s.common.CommonUtil;
+import io.agilehandy.k8s.common.InformerProperties;
 import io.fabric8.kubernetes.api.model.Endpoints;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.informers.cache.Lister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +33,7 @@ import org.springframework.stereotype.Component;
  **/
 
 @Component
-public class EndpointsCache implements InitializingBean {
+public class EndpointsCache {
 
 	private static Logger logger = LoggerFactory.getLogger(EndpointsCache.class);
 
@@ -43,21 +41,16 @@ public class EndpointsCache implements InitializingBean {
 	private final Set<String> cache = new ConcurrentSkipListSet();
 
 	private final KubernetesClient client;
-	private final CommonInformerProperties properties;
+	private final InformerProperties properties;
 	private final Lister<Endpoints> lister;
 
-	private boolean synced;
-
 	public EndpointsCache(KubernetesClient client
-			, CommonInformerProperties properties
+			, InformerProperties properties
 			, @Qualifier("endpointsLister") Lister<Endpoints> lister) {
 		this.client = client;
 		this.properties = properties;
 		this.lister = lister;
-		synced = false;
 	}
-
-	public boolean isSynced() { return synced; }
 
 	public boolean exists(Endpoints ep) {
 		return cache.contains(ep.getMetadata().getUid());
@@ -68,20 +61,17 @@ public class EndpointsCache implements InitializingBean {
 	}
 
 	public boolean isUpdated(Endpoints oldep, Endpoints newep) {
-		return !oldep.getMetadata().getResourceVersion()
+		return same(oldep, newep)
+		  && !oldep.getMetadata().getResourceVersion()
 				.equals(newep.getMetadata().getResourceVersion());
 	}
 
 	public boolean updateExisting(Endpoints oldep, Endpoints newep) {
-		return same(oldep, newep)
-				&& isUpdated(oldep, newep)
-				&& exists(oldep) ;
+		return exists(oldep) && isUpdated(oldep, newep);
 	}
 
 	public boolean pollingExisting(Endpoints oldep, Endpoints newep) {
-		return same(oldep, newep)
-				&& !isUpdated(oldep, newep)
-				&& exists(oldep);
+		return exists(oldep) && !isUpdated(oldep, newep);
 	}
 
 	public void removeFromCache(Endpoints ep) {
@@ -99,21 +89,4 @@ public class EndpointsCache implements InitializingBean {
 		addToCache(newep);
 	}
 
-	// TODO: remove
-	//  pre-filling the cache is not needed as the ADD event would add the endpoints resources anyways
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		logger.info("Start syncing cache.");
-		lister.list()
-				.stream()
-				.filter(ep ->
-						CommonUtil.isEnabledLabel(ep.getMetadata(), properties.getLabelEnabled())
-						&&
-						CommonUtil.isEnabledLabel(ep.getMetadata(), properties.getLabelRegister())
-				)
-				.forEach(ep -> cache.add(ep.getMetadata().getUid()))
-		;
-		logger.info("Cache is synced with {} endpoints", cache.size());
-		synced = true;
-	}
 }

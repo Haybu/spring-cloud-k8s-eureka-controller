@@ -22,13 +22,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  **/
 
 @ConfigurationProperties("eureka.k8s.proxy")
-public class CommonInformerProperties {
+public class InformerProperties {
 
 	private int watcherInterval = 30;
 	private String labelEnabled = "cloud.spring.io/enabled";
 	private String labelRegister = "cloud.spring.io/register";
 	private String primaryPortName = "primary_port";
-
 	private String namespace = "default";
 
 	public String getLabelEnabled() {
