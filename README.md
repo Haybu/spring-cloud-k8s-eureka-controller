@@ -25,7 +25,7 @@ $ kubectl create -f ./example/examle.yaml
 
 If you are running a local Minikube
  
-* to use RBAC start Minikube with `--extra-config=apiserver.Authorization.Mode=RBAC` option 
+* to use RBAC start Minikube with `--extra-config=apiserver.authorization_mode=RBAC` option 
 * you would need to change the Eureka service in the manifest to be of "NodePort" type (and the example also).
 * after installation, to find out a service URL in Minikube use ``` minikube service eureka-server --url```
 
