@@ -57,7 +57,7 @@
 		<dependency>
 			<groupId>io.fabric8</groupId>
 			<artifactId>kubernetes-client</artifactId>
-			<version>4.9.0</version>
+			<version>4.11.2</version>
 		</dependency>
 
 		<!-- to generate k8s manifest files -->
